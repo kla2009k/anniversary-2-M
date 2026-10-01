@@ -1,0 +1,44 @@
+"""Optional local visual regression/smoke test; requires Python Playwright + Chrome."""
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / 'test-output'
+OUT.mkdir(exist_ok=True)
+CHROME = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
+URL = 'http://localhost:5173/'
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True, executable_path=CHROME, args=['--enable-webgl', '--use-gl=angle', '--use-angle=swiftshader', '--disable-gpu-sandbox'])
+    page = browser.new_page(viewport={'width': 1280, 'height': 800}, device_scale_factor=1)
+    errors = []
+    page.on('pageerror', lambda error: errors.append(error.stack or str(error)))
+    failed = []
+    page.on('requestfailed', lambda request: failed.append(request.url))
+    page.goto(URL, wait_until='networkidle')
+    page.get_by_role('button', name='รับพัสดุอีกหนึ่งชิ้น →').wait_for()
+    page.screenshot(path=str(OUT/'intro.png'))
+    page.get_by_role('button', name='รับพัสดุอีกหนึ่งชิ้น →').click()
+    page.get_by_role('button', name='แกะเทป').click()
+    page.get_by_role('button', name='เปิดกล่อง').click()
+    page.get_by_text('0 / 8 ชิ้น').wait_for()
+    page.locator('.asset-loading').wait_for(state='hidden')
+    page.screenshot(path=str(OUT/'parcel-open.png'))
+    names = ['กำไลปี่เซียะ','โรตีกรอบ','ซองปากกาหนังสีแดง','ร้านกาแฟจันทร์เต็มดวงในคืนไร้จันทร์','อินทผาลัมอบแห้ง','ขนมสตรอว์เบอร์รี่เคลือบช็อกโกแลต','ข้าวเม่าห่อใบตอง','ลูกอมนมซองแดง']
+    for index,name in enumerate(names):
+        print('INSPECT',name,flush=True)
+        page.locator(f'button[title="{name}"]').click()
+        page.locator('.object-action').click()
+        page.wait_for_timeout(180)
+        page.screenshot(path=str(OUT/f'item-{index+1:02d}.png'))
+        page.get_by_role('button',name='วางของกลับลงกล่อง').click()
+    page.get_by_text('8 / 8 ชิ้น').wait_for()
+    page.get_by_role('button',name='เปิดของชิ้นสุดท้าย →').click()
+    page.get_by_role('heading',name='สุขสันต์วันครบรอบสองเดือนนะแฟน').wait_for()
+    page.screenshot(path=str(OUT/'ending.png'))
+    resources=page.evaluate('performance.getEntriesByType("resource").map(x => x.name)')
+    print('VISITED',len(names),'SFX_LOADED',sum('/sfx/' in x for x in resources),'TEXTURES_LOADED',sum('/textures/' in x for x in resources))
+    print('PAGE_ERRORS',errors)
+    print('REQUEST_FAILED',failed)
+    browser.close()
+    if errors: raise SystemExit(1)

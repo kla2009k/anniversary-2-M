@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Html, OrbitControls, PerspectiveCamera, SoftShadows } from '@react-three/drei'
+import { OrbitControls, PerspectiveCamera, SoftShadows, useProgress } from '@react-three/drei'
 import { BoxWorld } from './components/BoxWorld'
 import { DetailPanel } from './components/DetailPanel'
 import { ITEMS, CHAPTERS, ENDING_LINES } from './content'
@@ -11,6 +11,7 @@ export default function App() {
   const [phase,setPhase]=useState('intro'),[selected,setSelected]=useState(null),[visited,setVisited]=useState(()=>load('anniversary-visited',[]))
   const [actioned,setActioned]=useState(()=>load('anniversary-actioned',[])),[zoom,setZoom]=useState(1),[soundOn,setSoundOn]=useState(true)
   const [chapter,setChapter]=useState(0),[hint,setHint]=useState(false),[loader,setLoader]=useState(true),[closing,setClosing]=useState(false)
+  const { active: assetsLoading } = useProgress()
   const current=useMemo(()=>ITEMS.find(i=>i.id===selected),[selected]); const unlocked=visited.length===ITEMS.length
   const available=(item)=>item.layer===2||(item.layer===1&&ITEMS.filter(x=>x.layer===2&&visited.includes(x.id)).length>=2)||(item.layer===0&&ITEMS.filter(x=>x.layer===1&&visited.includes(x.id)).length>=2)
   useEffect(()=>{localStorage.setItem('anniversary-visited',JSON.stringify(visited))},[visited])
@@ -19,7 +20,7 @@ export default function App() {
   const s=(name)=>{if(soundOn)playSound(name)}
   const select=(id)=>{setSelected(id);setZoom(1);setVisited(v=>v.includes(id)?v:[...v,id]);s('pick')}
   const reset=()=>{setPhase('intro');setSelected(null);setVisited([]);setActioned([]);setChapter(0);setClosing(false);localStorage.removeItem('anniversary-visited');localStorage.removeItem('anniversary-actioned');s('paper')}
-  const act=()=>{if(!current)return;setActioned(v=>v.includes(current.id)?v.filter(x=>x!==current.id):[...v,current.id]);s('paper')}
+  const act=()=>{if(!current)return;setActioned(v=>v.includes(current.id)?v.filter(x=>x!==current.id):[...v,current.id]);s(current.id)}
   return <main className="app">
     <div className="paper-grain" aria-hidden="true"/>
     <header className="topbar"><div className="brand"><span className="brand-dot"/><div><strong>ของที่ลืมใส่ในกล่อง</strong><small>ถึงแตง · สองเดือนของเรา</small></div></div><nav><button className="icon-button" onClick={()=>setSoundOn(x=>!x)}>{soundOn?'♪ เสียงเปิด':'♪ เสียงปิด'}</button><button className="icon-button" onClick={reset}>เริ่มใหม่</button></nav></header>
@@ -28,10 +29,11 @@ export default function App() {
         <color attach="background" args={['#e8e1d4']}/><fog attach="fog" args={['#e8e1d4',7,16]}/><PerspectiveCamera makeDefault position={[0,3.2,7.6]} fov={38}/>
         <ambientLight intensity={1.25}/><directionalLight castShadow position={[4,8,5]} intensity={2.3} color="#fff1d5" shadow-mapSize-width={1024} shadow-mapSize-height={1024}/>
         <directionalLight position={[-5,3,-4]} intensity={.8} color="#91a9b7"/><SoftShadows size={18} focus={.5} samples={10}/>
-        <Suspense fallback={<Html center><span className="loading">กำลังวางของลงกล่อง...</span></Html>}><BoxWorld phase={phase} selected={selected} visited={visited} actioned={actioned} zoom={zoom} onTape={()=>{setPhase('untaped');s('tape')}} onOpen={()=>{setPhase('open');s('box')}} onSelect={select} onClear={()=>setSelected(null)} ending={phase==='ending'}/></Suspense>
+        <Suspense fallback={null}><BoxWorld phase={phase} selected={selected} visited={visited} actioned={actioned} zoom={zoom} onTape={()=>{setPhase('untaped');s('tape')}} onOpen={()=>{setPhase('open');s('box')}} onSelect={select} onClear={()=>setSelected(null)} ending={phase==='ending'}/></Suspense>
         <OrbitControls enabled={!current&&phase!=='ending'} enablePan={false} minDistance={5.7} maxDistance={9.2} minPolarAngle={.78} maxPolarAngle={1.42} minAzimuthAngle={-.72} maxAzimuthAngle={.72} target={[0,.8,0]}/>
       </Canvas>
       {loader&&<div className="loader"><span className="loader-box">▣</span><p>กำลังเตรียมพัสดุให้เธอ</p><i/></div>}
+      {!loader&&assetsLoading&&<div className="asset-loading">กำลังวางของลงกล่อง...</div>}
       {phase==='intro'&&<div className="intro overlay-card"><p className="eyebrow">จัดส่งแล้ว · 2 เดือนของเรา</p><h1>จริง ๆ ในกล่อง<br/>ยังขาดของอีกอย่าง</h1><p>ของที่ส่งไปถึงเธอมีอยู่จริงทุกชิ้น ลองเปิดกล่องดูทีละอย่าง แล้วค่อยเจอสิ่งที่ชั้นฝากไว้ในนี้</p><button className="primary" onClick={()=>{setPhase('sealed');s('chime')}}>รับพัสดุอีกหนึ่งชิ้น →</button></div>}
       {(phase==='sealed'||phase==='untaped')&&<div className="instruction-card"><span className="step">{phase==='sealed'?'01 / 02':'02 / 02'}</span><strong>{phase==='sealed'?'เริ่มที่เทปปิดกล่อง':'เปิดฝากล่อง'}</strong><p>{phase==='sealed'?'คลิกที่เทปบนกล่องเพื่อแกะ':'คลิกฝากล่องอีกครั้ง แล้วดูว่ามีอะไรซ่อนอยู่'}</p><button className="primary compact" onClick={()=>phase==='sealed'?(setPhase('untaped'),s('tape')):(setPhase('open'),s('box'))}>{phase==='sealed'?'แกะเทป':'เปิดกล่อง'}</button></div>}
       {phase==='open'&&!selected&&<div className="hud"><div className="hud-heading"><div><span className="eyebrow">ค้นในกล่อง</span><strong>{visited.length} / {ITEMS.length} ชิ้น</strong></div><button className="text-button" onClick={()=>setHint(x=>!x)}>{hint?'ซ่อนคำใบ้':'ขอคำใบ้'}</button></div><div className="item-grid">{ITEMS.map(item=><button key={item.id} className={visited.includes(item.id)?'seen':''} disabled={!available(item)} onClick={()=>select(item.id)} title={item.title}><span>{visited.includes(item.id)?'✓':available(item)?'?':'⌁'}</span>{available(item)?(hint||visited.includes(item.id)?item.kind:`ชั้นที่ ${item.layer+1}`):'ซ่อนอยู่'}</button>)}</div>{unlocked&&<button className="primary compact" onClick={()=>{setPhase('ending');s('chime')}}>เปิดของชิ้นสุดท้าย →</button>}<small>หยิบชิ้นบนก่อน ของด้านล่างจะค่อย ๆ ปรากฏ · หมุนฉากได้</small></div>}

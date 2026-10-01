@@ -1,5 +1,15 @@
-let context
-function ctx(){context ??= new (window.AudioContext || window.webkitAudioContext)(); if(context.state==='suspended') context.resume();return context}
-function tone(c,f,d,v=.06,type='sine',delay=0){const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+delay;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}
-function noise(c,d,v=.045){const n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();s.buffer=b;f.type='lowpass';f.frequency.value=1250;g.gain.value=v;s.connect(f).connect(g).connect(c.destination);s.start()}
-export function playSound(name){try{const c=ctx();if(name==='tape'){noise(c,.45,.12);tone(c,140,.14,.035,'sawtooth')}else if(name==='box'){noise(c,.24,.05);tone(c,155,.28,.06,'triangle')}else if(name==='paper'){noise(c,.13,.045);tone(c,480,.12,.018)}else if(name==='pick'){tone(c,440,.16,.04);tone(c,660,.22,.026,'sine',.08)}else if(name==='put'){tone(c,260,.16,.025)}else if(name==='chime'){tone(c,392,.52,.04);tone(c,494,.56,.035,'sine',.12);tone(c,588,.7,.03,'sine',.25)}}catch{}}
+// Original 48 kHz stereo close-mic-style Foley, rendered in tools/generate_sfx.py.
+// Audio objects are created lazily after a click, so mobile browsers permit playback.
+const names = new Set(['tape','box','pick','put','paper','bracelet','pen','book','dates','roti','khaomao','redsnack','berries','chime'])
+const cache = new Map()
+
+export function playSound(name) {
+  if (!names.has(name)) return
+  try {
+    const base = cache.get(name) ?? new Audio(`${import.meta.env.BASE_URL}sfx/${name}.wav`)
+    if (!cache.has(name)) { base.preload = 'auto'; cache.set(name, base) }
+    const voice = base.cloneNode()
+    voice.volume = name === 'chime' ? .34 : .52
+    voice.play().catch(() => {})
+  } catch { /* Audio is optional; the game remains fully playable. */ }
+}
