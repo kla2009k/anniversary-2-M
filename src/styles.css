@@ -72,12 +72,12 @@ button:focus-visible { outline: 2px solid #8c5e59; outline-offset: 4px; }
   z-index: 10;
   left: clamp(24px, 7vw, 108px);
   top: 50%;
-  width: min(430px, calc(100vw - 48px));
+  width: min(505px, calc(100vw - 48px));
   transform: translateY(-50%);
 }
 
 .eyebrow { margin: 0 0 12px; color: var(--red); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-.intro h1 { margin: 0 0 18px; font: 400 clamp(38px, 5.3vw, 76px)/.98 'Pridi', serif; letter-spacing: -.045em; }
+.intro h1 { margin: 0 0 18px; font: 400 clamp(38px, 5vw, 66px)/1.05 'Pridi', serif; letter-spacing: -.045em; }
 .intro > p:not(.eyebrow) { max-width: 380px; margin: 0 0 28px; color: #68635c; font-size: 15px; line-height: 1.85; }
 
 .primary {
