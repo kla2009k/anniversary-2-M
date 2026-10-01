@@ -8,6 +8,7 @@ import { ItemModel } from './ItemModels'
 const positions = {
   bracelet:[-0.82,0.74,0.52], pen:[0.75,0.43,-0.22], book:[-0.54,0.40,-0.33], dates:[0.6,0.28,0.38],
   roti:[0.42,0.82,-0.47], khaomao:[-0.5,0.79,-0.48], redsnack:[1.02,0.58,0.28], berries:[-0.87,0.28,0.34],
+  photo:[0,1.03,.02],
 }
 
 export function BoxWorld({ phase, selected, visited, actioned, zoom, onTape, onOpen, onSelect, onClear, ending }) {
@@ -26,7 +27,7 @@ export function BoxWorld({ phase, selected, visited, actioned, zoom, onTape, onO
     <ParcelBox phase={phase} onTape={onTape} onOpen={onOpen} muted={!!selected || ending}/>
     {(phase === 'open' || phase === 'ending') && ITEMS.map(item => <Inspectable key={item.id} item={item} home={positions[item.id]}
       selected={selected === item.id} hidden={!!selected && selected !== item.id} visited={visited.includes(item.id)}
-      locked={item.layer===1?ITEMS.filter(x=>x.layer===2&&visited.includes(x.id)).length<2:item.layer===0?ITEMS.filter(x=>x.layer===1&&visited.includes(x.id)).length<2:false}
+      locked={item.bonus?ITEMS.filter(x=>!x.bonus&&visited.includes(x.id)).length<8:item.layer===1?ITEMS.filter(x=>x.layer===2&&visited.includes(x.id)).length<2:item.layer===0?ITEMS.filter(x=>x.layer===1&&visited.includes(x.id)).length<2:false}
       actioned={actioned.includes(item.id)} zoom={zoom} small={size.width < 760} ending={ending}
       onSelect={() => onSelect(item.id)} onClear={onClear}/>)}
   </group>

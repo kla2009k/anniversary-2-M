@@ -23,6 +23,7 @@ export function ItemModel({id,actioned}) {
     case 'khaomao': return <KhaoMao opened={actioned}/>
     case 'redsnack': return <RedSnack opened={actioned}/>
     case 'berries': return <Berries opened={actioned}/>
+    case 'photo': return <ForgottenPhoto opened={actioned}/>
     default: return null
   }
 }
@@ -116,4 +117,16 @@ function BerryPouch({name,x,opened}) {
 }
 function Berries({opened}) {
   return <group rotation={[.03,-.05,0]}><BerryPouch name="berry-red.webp" x={-.27} opened={opened}/><BerryPouch name="berry-green.webp" x={.27} opened={opened}/>{opened&&[-.22,0,.22].map((x,i)=><mesh key={i} position={[x,-.32,.19]}><sphereGeometry args={[.075,18,12]}/><meshStandardMaterial color={i===2?'#81a462':'#ba6d6e'} roughness={.4}/></mesh>)}</group>
+}
+
+function ForgottenPhoto({opened}) {
+  return <group rotation={[0,opened ? Math.PI : 0,-.045]}>
+    <RoundedBox args={[.86,1.13,.025]} radius={.015} smoothness={4} castShadow><meshStandardMaterial color="#f8f3e9" roughness={.86}/></RoundedBox>
+    <mesh position={[0,.075,.015]}><planeGeometry args={[.76,.86]}/><meshStandardMaterial color="#b8d1dd" roughness={.9}/></mesh>
+    <Photo name="forgotten-photo.webp" width={.76} height={.86} position={[0,.075,.018]}/>
+    <mesh position={[0,-.47,.018]}><planeGeometry args={[.46,.018]}/><meshStandardMaterial color="#83a2ba" transparent opacity={.65}/></mesh>
+    <mesh position={[0,0,-.018]} rotation={[0,Math.PI,0]}><planeGeometry args={[.75,1.01]}/><meshStandardMaterial color="#ede5d7" roughness={1}/></mesh>
+    <mesh position={[0,.18,-.02]} rotation={[0,Math.PI,0]}><torusGeometry args={[.15,.013,8,48]}/><meshStandardMaterial color="#a87472" roughness={.8}/></mesh>
+    <mesh position={[0,-.22,-.02]} rotation={[0,Math.PI,.11]}><planeGeometry args={[.45,.015]}/><meshStandardMaterial color="#a87472" roughness={.8}/></mesh>
+  </group>
 }
