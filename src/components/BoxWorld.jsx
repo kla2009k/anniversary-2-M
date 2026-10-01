@@ -14,7 +14,9 @@ export function BoxWorld({ phase, selected, visited, actioned, zoom, onTape, onO
   const { size } = useThree()
   useFrame((state, delta) => {
     if (!root.current) return
-    root.current.position.y = THREE.MathUtils.damp(root.current.position.y, phase === 'intro' ? -0.15 : 0, 3, delta)
+    root.current.position.x = THREE.MathUtils.damp(root.current.position.x, phase === 'intro' && size.width > 760 ? .95 : 0, 3, delta)
+    root.current.position.y = THREE.MathUtils.damp(root.current.position.y, phase === 'intro' ? (size.width < 760 ? -1.0 : -.15) : 0, 3, delta)
+    root.current.scale.setScalar(THREE.MathUtils.damp(root.current.scale.x, phase === 'intro' && size.width < 760 ? .76 : 1, 3, delta))
     root.current.rotation.y = THREE.MathUtils.damp(root.current.rotation.y, phase === 'intro' ? -0.17 : 0, 3, delta)
     if (phase === 'intro') root.current.position.y += Math.sin(state.clock.elapsedTime * 1.2) * 0.002
   })
