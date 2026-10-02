@@ -66,6 +66,11 @@ button:focus-visible { outline: 2px solid #8c5e59; outline-offset: 4px; }
 
 .stage { position: relative; min-height: 0; }
 .stage canvas { touch-action: none; }
+.stage canvas{transition:transform .75s cubic-bezier(.2,.78,.2,1)}
+.stage.phase-cutting canvas{transform:scale(1.75);transform-origin:50% 52%}
+.stage.phase-untaped canvas{transform:scale(1.35);transform-origin:50% 52%}
+.stage.phase-opening canvas{transform:scale(1.48);transform-origin:50% 52%}
+@media(max-width:760px){.stage.phase-cutting canvas{transform:scale(1.35)}.stage.phase-untaped canvas{transform:scale(1.16)}.stage.phase-opening canvas{transform:scale(1.22)}}
 
 .overlay-card {
   position: absolute;
@@ -241,3 +246,12 @@ footer { border-top: 1px solid var(--line); border-bottom: 0; color: #898278; fo
 .note-deck-controls button{border:1px solid var(--line);background:#f7f0e5;border-radius:999px;padding:7px 13px;cursor:pointer;color:#655951;font-size:11px}
 .note-deck-controls button:disabled{opacity:.38;cursor:default}
 .note-disclaimer{display:block;margin-top:12px;color:#938b81;font-size:10px;line-height:1.6}
+.cutscene-overlay{position:absolute;inset:0;z-index:9;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:clamp(56px,11vh,110px);color:#f8efe2;text-align:center;background:linear-gradient(180deg,rgba(23,22,20,.45),transparent 34%,transparent 56%,rgba(28,25,22,.7));animation:cutscene-in .3s both}
+.cutscene-overlay::before,.cutscene-overlay::after{content:"";position:absolute;left:0;right:0;height:clamp(25px,5vh,52px);background:#2a2724}
+.cutscene-overlay::before{top:0}.cutscene-overlay::after{bottom:0}
+.cutscene-overlay span{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:#e1c6aa}.cutscene-overlay strong{font:400 clamp(19px,3vw,28px) 'Pridi',serif;margin:8px 0 13px}
+.cutscene-progress{width:min(260px,66vw);height:2px;background:rgba(255,255,255,.25)}.cutscene-progress i{display:block;height:100%;width:100%;background:#e5caa8;transform-origin:left;animation:cutscene-bar 2.05s linear both}
+@keyframes cutscene-bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes cutscene-in{from{opacity:0}to{opacity:1}}
+.fiction-shelf{border-top:1px solid var(--line);margin:8px 0 12px;padding-top:10px}.fiction-shelf summary{cursor:pointer;color:#8a625f;font-size:11px;line-height:1.6;list-style:none}.fiction-shelf summary::-webkit-details-marker{display:none}.fiction-shelf summary:hover{color:#5d4644}
+.fiction-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px;max-height:168px;overflow-y:auto}.fiction-grid button{border:1px solid #d2beb0;border-radius:10px;background:#f4e8dc;color:#665552;min-height:38px;cursor:pointer;font-size:10px}.fiction-grid button:hover{background:#ead8ca}.fiction-grid button span{display:inline-block;color:#ab7568;margin-right:5px}
+@media(max-width:760px){.cutscene-overlay{padding-bottom:90px}.cutscene-overlay::before,.cutscene-overlay::after{height:25px}.fiction-grid{max-height:105px}.fiction-grid button{font-size:9px;min-height:31px}}

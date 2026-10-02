@@ -24,6 +24,11 @@ export function ItemModel({id,actioned}) {
     case 'redsnack': return <RedSnack opened={actioned}/>
     case 'berries': return <Berries opened={actioned}/>
     case 'photo': return <ForgottenPhoto opened={actioned}/>
+    case 'fish': return <FishOnHook opened={actioned}/>
+    case 'case': return <ClearCase opened={actioned}/>
+    case 'ticket': return <TalkTicket opened={actioned}/>
+    case 'controller': return <TinyController opened={actioned}/>
+    case 'listening': return <ListeningCoin opened={actioned}/>
     default: return null
   }
 }
@@ -128,5 +133,71 @@ function ForgottenPhoto({opened}) {
     <mesh position={[0,0,-.018]} rotation={[0,Math.PI,0]}><planeGeometry args={[.75,1.01]}/><meshStandardMaterial color="#ede5d7" roughness={1}/></mesh>
     <mesh position={[0,.18,-.02]} rotation={[0,Math.PI,0]}><torusGeometry args={[.15,.013,8,48]}/><meshStandardMaterial color="#a87472" roughness={.8}/></mesh>
     <mesh position={[0,-.22,-.02]} rotation={[0,Math.PI,.11]}><planeGeometry args={[.45,.015]}/><meshStandardMaterial color="#a87472" roughness={.8}/></mesh>
+  </group>
+}
+
+function FishOnHook({opened}) {
+  const silver={color:'#83aebe',metalness:.54,roughness:.31}
+  return <group rotation={[0,opened ? -.48 : .17,.04]}>
+    <Line points={[[-.56,.55,0],[-.23,.49,0],[.06,.42,0],[.34,.33,0]]} color="#856b48" radius={.021}/>
+    <mesh position={[-.53,.55,0]} rotation={[0,0,-.55]}><cylinderGeometry args={[.025,.028,.28,10]}/><meshStandardMaterial color="#82603b" roughness={.7}/></mesh>
+    <Line points={[[.31,.34,0],[.34,.12,0],[.28,-.11,0],[.14,-.23,0]]} color="#d1dbdc" radius={.0035}/>
+    <mesh position={[.14,-.29,0]} rotation={[0,0,Math.PI*.65]}><torusGeometry args={[.09,.009,8,30,Math.PI*1.65]}/><meshStandardMaterial color="#c8d1d2" metalness={.9} roughness={.18}/></mesh>
+    <group position={[.08,-.31,.035]} rotation={[0,0,opened?.23:-.12]}>
+      <mesh castShadow scale={[.37,.19,.13]}><sphereGeometry args={[1,36,24]}/><meshStandardMaterial {...silver}/></mesh>
+      <mesh position={[-.38,0,0]} rotation={[0,0,opened?-.34:0]}><coneGeometry args={[.2,.31,3]}/><meshStandardMaterial color="#6d99ae" metalness={.45} roughness={.37} side={THREE.DoubleSide}/></mesh>
+      <mesh position={[.13,.14,0]} rotation={[0,0,-.2]}><coneGeometry args={[.13,.21,3]}/><meshStandardMaterial color="#719bad" metalness={.45} roughness={.38} side={THREE.DoubleSide}/></mesh>
+      <mesh position={[.27,.035,.119]}><sphereGeometry args={[.025,12,10]}/><meshStandardMaterial color="#14272b" roughness={.12}/></mesh>
+      <mesh position={[.19,0,.126]} rotation={[0,0,.18]}><torusGeometry args={[.09,.004,5,20,Math.PI*.8]}/><meshStandardMaterial color="#d4e2de" metalness={.4} roughness={.4}/></mesh>
+      {Array.from({length:18},(_,i)=>{const row=Math.floor(i/6),col=i%6,x=-.23+col*.071+(row%2)*.03,y=-.06+row*.058;return <mesh key={i} position={[x,y,.124]} scale={[.012,.019,.003]}><sphereGeometry args={[1,8,6]}/><meshStandardMaterial color={i%4?'#b7cfd0':'#6b9aab'} metalness={.42} roughness={.4}/></mesh>})}
+      {[-.1,0,.1].map((x,i)=><Line key={i} points={[[x,.13,.02],[x-.02,.23,.01],[x-.05,.25,-.01]]} color="#c0d5d3" radius={.0035}/>)}
+      <Line points={[[.29,-.055,.02],[.36,-.065,.04],[.4,-.04,.045]]} color="#344c52" radius={.004}/>
+    </group>
+    <mesh position={[.11,-.62,-.2]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[.34,.35,40]}/><meshStandardMaterial color="#91b5bd" transparent opacity={.58} side={THREE.DoubleSide}/></mesh>
+  </group>
+}
+
+function ClearCase({opened}) {
+  return <group rotation={[.06,-.17,.08]}>
+    <RoundedBox args={[.68,1.16,.075]} radius={.1} smoothness={8} castShadow><meshPhysicalMaterial color="#d8edf5" transparent opacity={.28} transmission={.35} thickness={.12} roughness={.13} metalness={0} side={THREE.DoubleSide}/></RoundedBox>
+    <RoundedBox args={[.59,1.04,.02]} radius={.07} smoothness={5} position={[0,0,.047]}><meshPhysicalMaterial color="#ffffff" transparent opacity={.13} roughness={.1}/></RoundedBox>
+    <mesh position={[-.2,.42,.054]}><capsuleGeometry args={[.055,.17,5,12]}/><meshStandardMaterial color="#cddfe5" transparent opacity={.65} roughness={.25}/></mesh>
+    {[-.26,.26].map(x=>[-.5,.5].map(y=><mesh key={`${x}-${y}`} position={[x,y,.058]}><sphereGeometry args={[.014,10,8]}/><meshStandardMaterial color="#ffffff" transparent opacity={.65}/></mesh>))}
+    {opened&&<group position={[0,0,.07]} scale={.55}><RoundedBox args={[.8,1.06,.01]} radius={.015} smoothness={3}><meshStandardMaterial color="#fff9ec"/></RoundedBox><Photo name="forgotten-photo.webp" width={.7} height={.78} position={[0,.1,.008]}/></group>}
+    <mesh position={[0,-.6,0]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.14,.008,6,32,Math.PI]}/><meshStandardMaterial color="#b6cbd0" metalness={.4} roughness={.27}/></mesh>
+  </group>
+}
+
+function TalkTicket({opened}) {
+  return <group rotation={[0,-.12,opened?.06:-.08]}>
+    <RoundedBox args={[1.3,.64,.018]} radius={.025} smoothness={4} castShadow><meshStandardMaterial color="#ead3ab" roughness={.94} side={THREE.DoubleSide}/></RoundedBox>
+    <mesh position={[-.35,0,.013]}><planeGeometry args={[.008,.57]}/><meshStandardMaterial color="#b7796e"/></mesh>
+    {Array.from({length:10},(_,i)=><mesh key={i} position={[-.35,-.26+i*.057,.019]}><circleGeometry args={[.006,8]}/><meshStandardMaterial color="#fff7e6"/></mesh>)}
+    <mesh position={[.22,.09,.014]}><planeGeometry args={[.64,.09]}/><meshStandardMaterial color="#a37468" transparent opacity={.68}/></mesh>
+    <mesh position={[.12,-.1,.014]}><planeGeometry args={[.44,.025]}/><meshStandardMaterial color="#a37468" transparent opacity={.42}/></mesh>
+    <mesh position={[.18,-.21,.014]}><planeGeometry args={[.55,.025]}/><meshStandardMaterial color="#a37468" transparent opacity={.3}/></mesh>
+    {opened&&<group position={[-.54,0,.04]} rotation={[0,-.6,-.22]}><mesh><planeGeometry args={[.22,.59]}/><meshStandardMaterial color="#e8d0a8" side={THREE.DoubleSide}/></mesh></group>}
+    <mesh position={[-.52,0,.018]}><ringGeometry args={[.08,.088,24]}/><meshStandardMaterial color="#a37468"/></mesh>
+  </group>
+}
+
+function TinyController({opened}) {
+  return <group rotation={[.17,opened?-.4:.15,.04]}>
+    <RoundedBox args={[1.05,.45,.22]} radius={.16} smoothness={8} castShadow><meshStandardMaterial color="#596373" roughness={.48} metalness={.12}/></RoundedBox>
+    {[-.43,.43].map(x=><mesh key={x} position={[x,-.19,.025]} rotation={[0,0,x*.38]}><capsuleGeometry args={[.13,.16,5,12]}/><meshStandardMaterial color="#596373" roughness={.5}/></mesh>)}
+    {[-.12,.12].map(x=><mesh key={x} position={[x,.09,.126]}><sphereGeometry args={[.07,20,12]}/><meshStandardMaterial color="#293444" roughness={.75}/></mesh>)}
+    <mesh position={[-.31,.11,.124]}><boxGeometry args={[.19,.045,.02]}/><meshStandardMaterial color="#dfd8c8"/></mesh>
+    <mesh position={[-.31,.11,.125]}><boxGeometry args={[.045,.19,.02]}/><meshStandardMaterial color="#dfd8c8"/></mesh>
+    {[[.27,.13],[.37,.04],[.37,.22],[.47,.13]].map(([x,y],i)=><mesh key={i} position={[x,y,.13]}><sphereGeometry args={[.035,12,8]}/><meshStandardMaterial color={['#d6a56e','#a9bb8f','#8fa8c6','#c68e98'][i]} roughness={.35}/></mesh>)}
+    {opened&&<><mesh position={[0,.32,-.01]} rotation={[.45,0,0]}><boxGeometry args={[.12,.14,.035]}/><meshStandardMaterial color="#b5a7c9"/></mesh><mesh position={[0,.43,0]}><sphereGeometry args={[.055,12,8]}/><meshStandardMaterial color="#d7c9de" emissive="#aa88bb" emissiveIntensity={.3}/></mesh></>}
+  </group>
+}
+
+function ListeningCoin({opened}) {
+  return <group rotation={[.25,opened?Math.PI:.16,.04]}>
+    <mesh castShadow rotation={[Math.PI/2,0,0]}><cylinderGeometry args={[.48,.48,.07,72]}/><meshStandardMaterial color="#cba76d" metalness={.72} roughness={.25}/></mesh>
+    {[.4,.35,.31].map(r=><mesh key={r} position={[0,0,.041]}><ringGeometry args={[r,r+.004,64]}/><meshStandardMaterial color="#f6db9d" metalness={.76} roughness={.22} side={THREE.DoubleSide}/></mesh>)}
+    {Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2;return <mesh key={i} position={[Math.sin(a)*.47,Math.cos(a)*.47,0]} rotation={[0,0,-a]}><boxGeometry args={[.006,.032,.073]}/><meshStandardMaterial color="#f2d494" metalness={.74} roughness={.28}/></mesh>})}
+    {!opened?<>{[-.21,-.14,-.07,0,.07,.14,.21].map((x,i)=><mesh key={i} position={[x,0,.046]}><boxGeometry args={[.018,[.13,.24,.33,.17,.28,.2,.1][i],.008]}/><meshStandardMaterial color="#fbebc2" metalness={.62} roughness={.25}/></mesh>)}</>:<><mesh position={[0,0,-.046]} rotation={[0,Math.PI,0]}><torusGeometry args={[.19,.025,10,48]}/><meshStandardMaterial color="#f5dc9f" metalness={.7} roughness={.25}/></mesh><mesh position={[0,0,-.052]}><sphereGeometry args={[.07,20,12]}/><meshStandardMaterial color="#f9e9bc" metalness={.6} roughness={.3}/></mesh></>}
   </group>
 }
